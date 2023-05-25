@@ -21,4 +21,6 @@ namespace fs = boost::filesystem;
 
 Surface_mesh generate_wrap_for_organ(fs::directory_entry &organ_path, const double relative_alpha, const double relative_offset);
 
+Surface_mesh generate_wrap_for_mesh(std::string mesh_path, const double relative_alpha, const double relative_offset);
+
 

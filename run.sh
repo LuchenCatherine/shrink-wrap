@@ -1,1 +1,1 @@
-./build/alpha_wrap /home/catherine/data/model/plain_v1.3
+./build/alpha_wrap /home/catherine/data/model/plain_v1.3 /home/catherine/data/model/shrink_wrap_v1.3
