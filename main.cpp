@@ -57,7 +57,7 @@ int main(int argc, char** argv)
             std::string path = entry.path().string();
             fs::path name = entry.path().stem();
 
-            Surface_mesh wrap = generate_wrap_for_mesh(path, relative_alpha, relative_offset);
+            Surface_mesh wrap = generate_wrap_for_mesh_if_not_watertight(path, relative_alpha, relative_offset);
 
             if (!fs::exists(output_organ_dir)) fs::create_directory(output_organ_dir);
             auto output_file_path = output_organ_dir / name;

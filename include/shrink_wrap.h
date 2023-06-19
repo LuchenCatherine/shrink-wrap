@@ -23,4 +23,5 @@ Surface_mesh generate_wrap_for_organ(fs::directory_entry &organ_path, const doub
 
 Surface_mesh generate_wrap_for_mesh(std::string mesh_path, const double relative_alpha, const double relative_offset);
 
+Surface_mesh generate_wrap_for_mesh_if_not_watertight(std::string mesh_path, const double relative_alpha, const double relative_offset);
 
