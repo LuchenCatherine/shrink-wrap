@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 project(SURFACE_RECONSTRUCTION)
 
-set(CGAL_DIR "$ENV{HOME}/CGAL-5.5.1")
+set(CGAL_DIR "$ENV{HOME}/CGAL-5.5.2")
 set(CMAKE_BUILD_TYPE "Release")
 
 find_package(CGAL REQUIRED)
