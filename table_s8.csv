@@ -236,7 +236,7 @@ VH_M_Blood_Vasculature,VH_M_inferior_mesenteric_artery,670.876,Yes,Yes
 VH_M_Blood_Vasculature,VH_M_posterior_vein_of_left_ventricle,134.237,Yes,Yes
 VH_M_Blood_Vasculature,VH_M_left_marginal_branch,22.2216,Yes,Yes
 VH_M_Blood_Vasculature,VH_M_external_iliac_vein_L,3785.62,Yes,Yes
-VH_M_Blood_Vasculature,VH_M_left_coronary_artery,
+VH_M_Blood_Vasculature,VH_M_left_coronary_artery,8.93328,No,Yes
 VH_M_Blood_Vasculature,VH_M_superior_vena_cava,6182.7,No,Yes
 VH_M_Blood_Vasculature,VH_M_brachiocephalic_vein_L,2024.27,Yes,Yes
 VH_M_Blood_Vasculature,VH_M_ileocolic_artery,366.128,Yes,Yes

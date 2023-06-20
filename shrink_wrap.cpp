@@ -101,31 +101,43 @@ Surface_mesh generate_wrap_for_mesh(std::string mesh_path, const double relative
 Surface_mesh generate_wrap_for_mesh_if_not_watertight(std::string mesh_path, const double relative_alpha, const double relative_offset, std::ofstream &output)
 {
 
+  // return result
+  Surface_mesh wrap;
+
   // step 1: load (non-)manifold mesh 
   Surface_mesh mesh;
   std::vector<Point> points;
   std::vector<std::vector<std::size_t> > polygons;
-  
-  if(!CGAL::IO::read_polygon_soup(mesh_path, points, polygons) || points.empty())
-  {
-    std::cerr << "Cannot open file " << mesh_path << std::endl;
-    output << "\n";
-    return mesh;
-  }
-  PMP::orient_polygon_soup(points, polygons);
-  PMP::polygon_soup_to_polygon_mesh(points, polygons, mesh);
 
-  // step 2: check watertight or not
-  bool is_self_intersected = PMP::does_self_intersect(mesh);
-  bool is_closed = CGAL::is_closed(mesh);
-
-  Surface_mesh wrap;
   bool is_fully_watertight_before_shrink_wrap = true;
-
-  if (!is_self_intersected && is_closed)
+  if(CGAL::IO::read_polygon_soup(mesh_path, points, polygons) && !points.empty())
   {
-    std::cout << mesh_path << " is watertight." << std::endl;
-    wrap = mesh;
+
+    PMP::orient_polygon_soup(points, polygons);
+    PMP::polygon_soup_to_polygon_mesh(points, polygons, mesh);
+
+    // step 2: check watertight or not
+    bool is_self_intersected = PMP::does_self_intersect(mesh);
+    bool is_closed = CGAL::is_closed(mesh);
+
+    if (!is_self_intersected && is_closed)
+    {
+      std::cout << mesh_path << " is watertight." << std::endl;
+      wrap = mesh;
+    }
+    else
+    {
+      is_fully_watertight_before_shrink_wrap = false;
+      // step 3: create the alpha wrap if not watertight
+      fs::path mesh_p = fs::path(mesh_path);
+      fs::path plain_folder("/home/luchen/data/model/plain_v1.3/");
+      fs::path manifold_folder("/home/luchen/data/model/plain_manifold_filling_hole_v1.3");
+      fs::path relative_path = fs::relative(mesh_p, manifold_folder);
+      fs::path plain_mesh_path = plain_folder / relative_path;
+      std::cout << "plain_mesh_path: " << plain_mesh_path <<std::endl;
+
+      wrap = generate_wrap_for_mesh(plain_mesh_path.string(), relative_alpha, relative_offset);
+    }
   }
   else 
   {
