@@ -131,22 +131,31 @@ Surface_mesh generate_wrap_for_mesh_if_not_watertight(std::string mesh_path, con
   {
     is_fully_watertight_before_shrink_wrap = false;
     // step 3: create the alpha wrap if not watertight
-    CGAL::Bbox_3 bbox = PMP::bbox(mesh);
+    fs::path mesh_p = fs::path(mesh_path);
+    fs::path plain_folder("/home/luchen/data/model/plain_v1.3/");
+    fs::path manifold_folder("/home/luchen/data/model/plain_manifold_filling_hole_v1.3");
+    fs::path relative_path = fs::relative(mesh_p, manifold_folder);
+    fs::path plain_mesh_path = plain_folder / relative_path;
+    std::cout << "plain_mesh_path: " << plain_mesh_path <<std::endl;
+
+    wrap = generate_wrap_for_mesh(plain_mesh_path.string(), relative_alpha, relative_offset);
+
+    // CGAL::Bbox_3 bbox = PMP::bbox(mesh);
     
-    const double diag_length = std::sqrt(CGAL::square(bbox.xmax() - bbox.xmin()) +
-                                        CGAL::square(bbox.ymax() - bbox.ymin()) +
-                                        CGAL::square(bbox.zmax() - bbox.zmin()));
-    const double alpha = diag_length / relative_alpha;
-    const double offset = diag_length / relative_offset;
+    // const double diag_length = std::sqrt(CGAL::square(bbox.xmax() - bbox.xmin()) +
+    //                                     CGAL::square(bbox.ymax() - bbox.ymin()) +
+    //                                     CGAL::square(bbox.zmax() - bbox.zmin()));
+    // const double alpha = diag_length / relative_alpha;
+    // const double offset = diag_length / relative_offset;
 
-    CGAL::Real_timer t;
-    t.start();
-    // Surface_mesh wrap;
-    CGAL::alpha_wrap_3(mesh, alpha, offset, wrap);
-    t.stop();
+    // CGAL::Real_timer t;
+    // t.start();
+    // // Surface_mesh wrap;
+    // CGAL::alpha_wrap_3(mesh, alpha, offset, wrap);
+    // t.stop();
 
-    std::cout << mesh_path << ":\nResult: " << num_vertices(wrap) << " vertices, " << num_faces(wrap) << " faces, ";
-    std::cout << "Took " << t.time() << " s." << std::endl;
+    // std::cout << mesh_path << ":\nResult: " << num_vertices(wrap) << " vertices, " << num_faces(wrap) << " faces, ";
+    // std::cout << "Took " << t.time() << " s." << std::endl;
   }
 
   // step 4: compute the volume of the wrap for each AS
