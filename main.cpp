@@ -44,6 +44,11 @@ int main(int argc, char** argv)
 
     // }
 
+    // Generate Table S8: All anatomical structures in the HRA v1.3 + watertight for CTPop
+    std::ofstream output;
+    output.open("table_s8.csv");
+    output << "organ,AS,volume,is_fully_watertight_before_shrink_wrap,is_fully_watertight_after_shrink_wrap\n";
+
     // traverse all the anatomical structures
     fs::path dir(output_organ_AS_dir);
     for (fs::directory_entry& organ_path : fs::directory_iterator(body_path)) 
@@ -57,12 +62,14 @@ int main(int argc, char** argv)
             std::string path = entry.path().string();
             fs::path name = entry.path().stem();
 
-            Surface_mesh wrap = generate_wrap_for_mesh_if_not_watertight(path, relative_alpha, relative_offset);
+            output << organ_name.string() << "," << name.string() << ",";
+
+            Surface_mesh wrap = generate_wrap_for_mesh_if_not_watertight(path, relative_alpha, relative_offset, output);
 
             if (!fs::exists(output_organ_dir)) fs::create_directory(output_organ_dir);
             auto output_file_path = output_organ_dir / name;
 
-            CGAL::IO::write_polygon_mesh(output_file_path.string() + ".off", wrap, CGAL::parameters::stream_precision(17));
+            CGAL::IO::write_polygon_mesh(output_file_path.string() + ".off", wrap, CGAL::parameters::stream_precision(17));            
 
         }
 

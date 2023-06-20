@@ -98,7 +98,7 @@ Surface_mesh generate_wrap_for_mesh(std::string mesh_path, const double relative
 
 }
 
-Surface_mesh generate_wrap_for_mesh_if_not_watertight(std::string mesh_path, const double relative_alpha, const double relative_offset)
+Surface_mesh generate_wrap_for_mesh_if_not_watertight(std::string mesh_path, const double relative_alpha, const double relative_offset, std::ofstream &output)
 {
 
   // step 1: load (non-)manifold mesh 
@@ -109,6 +109,7 @@ Surface_mesh generate_wrap_for_mesh_if_not_watertight(std::string mesh_path, con
   if(!CGAL::IO::read_polygon_soup(mesh_path, points, polygons) || points.empty())
   {
     std::cerr << "Cannot open file " << mesh_path << std::endl;
+    output << "\n";
     return mesh;
   }
   PMP::orient_polygon_soup(points, polygons);
@@ -118,33 +119,47 @@ Surface_mesh generate_wrap_for_mesh_if_not_watertight(std::string mesh_path, con
   bool is_self_intersected = PMP::does_self_intersect(mesh);
   bool is_closed = CGAL::is_closed(mesh);
 
+  Surface_mesh wrap;
+  bool is_fully_watertight_before_shrink_wrap = true;
+
   if (!is_self_intersected && is_closed)
   {
     std::cout << mesh_path << " is watertight." << std::endl;
-    return mesh;
+    wrap = mesh;
   }
-  
-  // step 3: create the alpha wrap if not watertight
-  CGAL::Bbox_3 bbox = PMP::bbox(mesh);
-  
-  const double diag_length = std::sqrt(CGAL::square(bbox.xmax() - bbox.xmin()) +
-                                       CGAL::square(bbox.ymax() - bbox.ymin()) +
-                                       CGAL::square(bbox.zmax() - bbox.zmin()));
-  const double alpha = diag_length / relative_alpha;
-  const double offset = diag_length / relative_offset;
+  else 
+  {
+    is_fully_watertight_before_shrink_wrap = false;
+    // step 3: create the alpha wrap if not watertight
+    CGAL::Bbox_3 bbox = PMP::bbox(mesh);
+    
+    const double diag_length = std::sqrt(CGAL::square(bbox.xmax() - bbox.xmin()) +
+                                        CGAL::square(bbox.ymax() - bbox.ymin()) +
+                                        CGAL::square(bbox.zmax() - bbox.zmin()));
+    const double alpha = diag_length / relative_alpha;
+    const double offset = diag_length / relative_offset;
 
-  CGAL::Real_timer t;
-  t.start();
-  Surface_mesh wrap;
-  CGAL::alpha_wrap_3(mesh, alpha, offset, wrap);
-  t.stop();
+    CGAL::Real_timer t;
+    t.start();
+    // Surface_mesh wrap;
+    CGAL::alpha_wrap_3(mesh, alpha, offset, wrap);
+    t.stop();
 
-  std::cout << mesh_path << ":\nResult: " << num_vertices(wrap) << " vertices, " << num_faces(wrap) << " faces, ";
-  std::cout << "Took " << t.time() << " s." << std::endl;
-  
+    std::cout << mesh_path << ":\nResult: " << num_vertices(wrap) << " vertices, " << num_faces(wrap) << " faces, ";
+    std::cout << "Took " << t.time() << " s." << std::endl;
+  }
+
   // step 4: compute the volume of the wrap for each AS
   double volume = PMP::volume(wrap) * 1e9;
   std::cout << "Volume is " << volume << std::endl;
+
+  output << volume << ",";
+
+  // always watertight after shrink wrap
+  if (is_fully_watertight_before_shrink_wrap)
+    output << "Yes" << "," << "Yes\n";
+  else
+    output << "No" << "," << "Yes\n";
 
   return wrap;
 
